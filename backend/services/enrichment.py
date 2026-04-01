@@ -3,38 +3,35 @@ from core.config import settings
 
 def query_abuseipdb(ip_address: str) -> dict:
     """
-    Reaches out to the AbuseIPDB API to get threat intelligence for a specific IP.
+    Queries AbuseIPDB API with proper error handling and dummy fallback.
     """
-    # If no API key is set in the .env file, return a dummy response for testing
-    if not settings.ABUSEIPDB_API_KEY or settings.ABUSEIPDB_API_KEY == "your_api_key_here":
-        print("[WARNING] No valid AbuseIPDB API key found. Returning dummy data.")
+    # 1. Dummy Data Fallback
+    if not settings.ABUSEIPDB_API_KEY or "your_api_key" in settings.ABUSEIPDB_API_KEY:
         return {
             "abuseConfidenceScore": 85,
             "totalReports": 120,
             "countryCode": "RU",
-            "domain": "malicious-example.com"
+            "domain": "dummy-data.com"
         }
-
+    
+    # 2. Setup Request
     url = "https://api.abuseipdb.com/api/v2/check"
-    
-    querystring = {
-        "ipAddress": ip_address,
-        "maxAgeInDays": "90"
-    }
-    
-    headers = {
-        "Accept": "application/json",
-        "Key": settings.ABUSEIPDB_API_KEY
-    }
+    querystring = {"ipAddress": ip_address, "maxAgeInDays": "90"}
+    headers = {"Accept": "application/json", "Key": settings.ABUSEIPDB_API_KEY}
 
     try:
-        # We add a 5-second timeout so our app doesn't hang forever if the API is down
+        # 3. ACTUALLY MAKE THE REQUEST FIRST
         response = requests.get(url, headers=headers, params=querystring, timeout=5)
         
-        # This will raise an HTTPError if the status is 4xx or 5xx
+        # 4. Handle Specific Status Codes
+        if response.status_code == 422:
+            print(f"[VALIDATION ERROR] {ip_address} is not a valid public IP.")
+            return {"abuseConfidenceScore": 0, "totalReports": 0, "error": "Invalid IP format"}
+
+        # 5. Handle Other HTTP Errors (401, 429, 500, etc.)
         response.raise_for_status()
         
-        # AbuseIPDB nests their actual data inside a "data" key
+        # 6. Parse and Return Data
         json_response = response.json()
         return json_response.get("data", {})
 

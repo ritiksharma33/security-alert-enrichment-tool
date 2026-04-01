@@ -3,7 +3,7 @@ import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
-
+from fastapi.middleware.cors import CORSMiddleware
 # Import our custom modules
 from models.schemas import AlertRequest, EnrichedAlert
 from services.enrichment import query_abuseipdb
@@ -20,10 +20,10 @@ app = FastAPI(
 # to talk to this FastAPI backend (running on port 8000) without being blocked.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, change "*" to your React app's URL
+    allow_origins=["http://localhost:5173"], # Your React dev URL
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"], # Allows POST, GET, etc.
+    allow_headers=["*"], # Allows all headers
 )
 
 # --- STANDARD REST ENDPOINT ---
