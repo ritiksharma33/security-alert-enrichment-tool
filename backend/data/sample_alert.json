@@ -1,0 +1,6 @@
+{
+    "alert_id": "10234",
+    "timestamp": "2026-04-01T12:00:00Z",
+    "source_ip": "198.51.100.4",
+    "event": "Failed Login"
+}
