@@ -1,0 +1,7 @@
+ip,description
+1.1.1.1,Cloudflare DNS (Should be SAFE via Whitelist)
+8.8.8.8,Google DNS (Should be SAFE via Whitelist)
+127.0.0.1,Localhost (Should be SAFE via Whitelist)
+13.201.145.17,Known Indian IP (Should be SUSPICIOUS or WARNING)
+185.224.128.83,Potential SSH Brute Forcer (Likely CRITICAL)
+45.143.203.2,Known Scanner IP (Likely CRITICAL)

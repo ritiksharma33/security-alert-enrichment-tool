@@ -4,10 +4,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
 from fastapi.middleware.cors import CORSMiddleware
-# Import our custom modules
+
 from models.schemas import AlertRequest, EnrichedAlert
 from services.enrichment import query_abuseipdb
 from services.logic import analyze_threat
+from services.domain_service import lookup_domain
+from services.logic import analyze_domain_risk
+
+from fastapi import UploadFile, File
+from services.bulk_service import process_bulk_csv
 
 app = FastAPI(
     title="Automated Security Alert Enrichment Tool",
@@ -45,7 +50,19 @@ async def process_alert(alert: AlertRequest):
         risk_level=risk_level,
         threat_intel=intel_model
     )
-
+@app.post("/api/bulk-scan")
+async def bulk_scan(file: UploadFile = File(...)):
+    contents = await file.read()
+    results = await process_bulk_csv(contents)
+    return {"status": "success", "data": results}
+@app.get("/api/domain")
+async def domain_intel(domain: str):
+    data = lookup_domain(domain)
+    if "error" in data:
+        return data
+        
+    risk_level = analyze_domain_risk(data)
+    return {**data, "risk_level": risk_level}
 
 @app.get("/api/enrich/stream")
 async def stream_enrichment_logs(ip: str):

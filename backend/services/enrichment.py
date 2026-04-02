@@ -1,6 +1,42 @@
 import requests
 from core.config import settings
 
+
+import os
+import httpx
+from dotenv import load_dotenv
+
+load_dotenv()
+API_KEY = os.getenv("ABUSEIPDB_API_KEY")
+
+async def get_ip_intel(ip_address: str) -> dict:
+    """
+    Fetches threat intelligence for a single IP from AbuseIPDB.
+    This is the core 'Enrichment' function.
+    """
+    url = "https://api.abuseipdb.com/api/v2/check"
+    headers = {
+        "Accept": "application/json",
+        "Key": API_KEY
+    }
+    params = {
+        "ipAddress": ip_address,
+        "maxAgeInDays": "90"
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, headers=headers, params=params)
+            if response.status_code == 200:
+            
+                return response.json().get("data", {})
+            else:
+                print(f"[ERROR] API returned status {response.status_code}")
+                return {}
+        except Exception as e:
+            print(f"[ERROR] Connection to AbuseIPDB failed: {e}")
+            return {}
+
 def query_abuseipdb(ip_address: str) -> dict:
     """
     Queries AbuseIPDB API with proper error handling and dummy fallback.

@@ -1,5 +1,20 @@
 from models.schemas import ThreatIntelligence
-
+def analyze_domain_risk(domain_data: dict) -> str:
+    """
+    Heuristic for Domain Risk.
+    New domains (< 30 days) = CRITICAL
+    Recent domains (< 90 days) = WARNING
+    """
+    age = domain_data.get("age_days", 999)
+    
+    if age < 30:
+        return "CRITICAL" 
+    elif age < 90:
+        return "WARNING"
+    elif age > 365:
+        return "SAFE"
+    
+    return "SUSPICIOUS"
 
 WHITELIST = {
     "1.1.1.1", "1.0.0.1",       # Cloudflare
@@ -48,6 +63,7 @@ def analyze_threat(raw_threat_data: dict) -> tuple[str, ThreatIntelligence]:
 
     else:
         risk_level = "SAFE"
+
 
 
     intel_model = ThreatIntelligence(
