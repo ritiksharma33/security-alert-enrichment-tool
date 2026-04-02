@@ -1,8 +1,10 @@
 # 🛡️ Sentinel SOAR 
 ### (Basically, a way to stop doing manual security lookups)
 
-I built **Sentinel SOAR** because let's be honest—checking every single suspicious IP or file hash manually is a pain. This is a modular framework that handles the "boring" parts of security analysis. It hooks up to a few big threat intel APIs and uses some "If-This-Then-That" logic to tell you if something is actually dangerous or just a false alarm. 
 
+https://github.com/user-attachments/assets/791304ee-5360-4478-aeb3-6f4030105eda
+
+I built **Sentinel SOAR** because let's be honest—checking every single suspicious IP or file hash manually is a pain. This is a modular framework that handles the "boring" parts of security analysis. It hooks up to a few big threat intel APIs and uses some "If-This-Then-That" logic to tell you if something is actually dangerous or just a false alarm. 
 It saves me (and hopefully other analysts) about 80% of the time usually spent on MTTR.
 
 ## 🚀 What it actually does
