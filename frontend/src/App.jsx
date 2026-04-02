@@ -59,19 +59,41 @@ const [isHashLoading, setIsHashLoading] = useState(false);
     };
   };
 
-  const fetchFinalResult = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/enrich', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source_ip: ip, event: "Manual UI Scan" })
-      });
-      const data = await response.json();
-      setResult(data);
-      setIsProcessing(false);
-    } catch (error) { console.error(error); }
-  };
+const fetchFinalResult = async () => {
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/enrich', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+          source_ip: ip, // MUST MATCH BACKEND KEY
+          event: "Manual UI Scan"
+      })
+    });
 
+    // CRITICAL: Stop if backend says no
+    if (!response.ok) {
+      const err = await response.json();
+      setLogs(prev => [...prev, `[ERROR] Backend rejected request: ${JSON.stringify(err.detail)}`]);
+      setIsProcessing(false);
+      return;
+    }
+
+    const data = await response.json();
+    
+    // Safety check before setting state
+    if (data.error) {
+      setLogs(prev => [...prev, `[ERROR] ${data.error}`]);
+    } else {
+      setResult(data);
+    }
+    
+    setIsProcessing(false);
+  } catch (error) {
+    console.error("Crash Prevention:", error);
+    setLogs(prev => [...prev, "[ERROR] Critical UI Failure averted."]);
+    setIsProcessing(false);
+  }
+};
   // --- LOGIC: DOMAIN LOOKUP ---
   const startDomainLookup = async () => {
     if (!domain) return;
