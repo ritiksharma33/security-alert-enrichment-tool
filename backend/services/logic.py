@@ -1,34 +1,55 @@
 from models.schemas import ThreatIntelligence
 
+
+WHITELIST = {
+    "1.1.1.1", "1.0.0.1",       # Cloudflare
+    "8.8.8.8", "8.8.4.4",       # Google DNS
+    "9.9.9.9",                  # Quad9
+    "127.0.0.1", "0.0.0.0"      # Localhost / Internal
+}
+
 def analyze_threat(raw_threat_data: dict) -> tuple[str, ThreatIntelligence]:
     """
-    Redesigned logic to classify risk based on sensitivity.
-    Now categorizes 10% activity as SUSPICIOUS instead of SAFE.
+    Advanced SOAR Playbook Logic:
+    1. Checks Whitelist for Trusted Infrastructure.
+    2. Applies a Tiered Sensitivity Matrix for Risk Classification.
     """
+
+    ip = raw_threat_data.get("ipAddress", "Unknown")
     score = raw_threat_data.get("abuseConfidenceScore", 0)
     reports = raw_threat_data.get("totalReports", 0)
-    country = raw_threat_data.get("countryCode")
-    domain = raw_threat_data.get("domain")
+    country = raw_threat_data.get("countryCode", "Unknown")
+    domain = raw_threat_data.get("domain", "N/A")
 
-    # --- THE SENSITIVITY MATRIX ---
+
+    if ip in WHITELIST:
+        risk_level = "SAFE"
+     
+        intel_model = ThreatIntelligence(
+            abuse_confidence_score=0,
+            total_reports=reports,
+            country_code=country,
+            domain="TRUSTED_INFRASTRUCTURE"
+        )
+        return risk_level, intel_model
+
     
-    # 1. CRITICAL: High confidence of malicious activity (>= 50%)
     if score >= 50:
         risk_level = "CRITICAL"
         
-    # 2. WARNING: Moderate confidence or high volume of reports
+  
     elif score >= 20 or reports > 10:
         risk_level = "WARNING"
         
-    # 3. SUSPICIOUS: Any measurable threat activity (Your 10% sits here!)
+
     elif score >= 5 or reports > 0:
         risk_level = "SUSPICIOUS"
         
-    # 4. SAFE: Absolutely zero evidence of abuse
+
     else:
         risk_level = "SAFE"
 
-    # Package data into the Pydantic schema
+
     intel_model = ThreatIntelligence(
         abuse_confidence_score=score,
         total_reports=reports,

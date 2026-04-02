@@ -1,7 +1,7 @@
 from pydantic import BaseModel, IPvAnyAddress
 from typing import Optional
 
-# 1. Incoming Request Schema
+
 class AlertRequest(BaseModel):
     """
     Validates the incoming alert data.
@@ -11,7 +11,7 @@ class AlertRequest(BaseModel):
     source_ip: IPvAnyAddress
     event: str
 
-# 2. Threat Intelligence Sub-Schema
+
 class ThreatIntelligence(BaseModel):
     """
     Structures the data we get back from AbuseIPDB.
@@ -21,7 +21,7 @@ class ThreatIntelligence(BaseModel):
     country_code: Optional[str] = None
     domain: Optional[str] = None
 
-# 3. Final Outgoing Response Schema
+
 class EnrichedAlert(BaseModel):
     """
     The final JSON structure that will be sent to your React frontend 
