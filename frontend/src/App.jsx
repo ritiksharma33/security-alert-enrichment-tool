@@ -25,6 +25,11 @@ function App() {
   const [bulkResults, setBulkResults] = useState([]);
   const [isBulkLoading, setIsBulkLoading] = useState(false);
 
+    // Hash Module
+  const [fileHash, setFileHash] = useState('');
+const [hashResult, setHashResult] = useState(null);
+const [isHashLoading, setIsHashLoading] = useState(false);
+
   const modules = [
     { id: 'ip-enrichment', name: 'IP Intel', icon: <Shield size={20} /> },
     { id: 'domain-intel', name: 'Domain Lookup', icon: <Globe size={20} /> },
@@ -207,15 +212,42 @@ function App() {
               )}
             </div>
           )}
-
-          {/* 4. PLACEHOLDERS */}
           {currentModule === 'file-hash' && (
-            <div className="placeholder-view">
-              <FileSearch size={64} opacity={0.1} />
-              <h2>Hash Analysis Module</h2>
-              <p>Integration in progress (VirusTotal API).</p>
-            </div>
-          )}
+  <div className="module-fade-in">
+    <div className="search-box">
+      <FileSearch size={20} />
+      <input 
+        type="text" 
+        placeholder="Enter SHA-256 / MD5 Hash..." 
+        value={fileHash} 
+        onChange={(e) => setFileHash(e.target.value)} 
+      />
+      <button onClick={async () => {
+        setIsHashLoading(true);
+        const res = await fetch(`http://127.0.0.1:8000/api/hash?hash=${fileHash}`);
+        const data = await res.json();
+        setHashResult(data);
+        setIsHashLoading(false);
+      }} disabled={isHashLoading}>
+        {isHashLoading ? 'Searching...' : 'Scan Hash'}
+      </button>
+    </div>
+
+    {hashResult && (
+      <div className={`result-card ${hashResult.risk_level?.toLowerCase()}`}>
+        <h3>FILE RISK: {hashResult.risk_level}</h3>
+        <div className="stats-container">
+          <div className="stat-item"><span>MALICIOUS DETECTIONS</span><strong>{hashResult.malicious} / 70+</strong></div>
+          <div className="stat-item"><span>FILE TYPE</span><strong>{hashResult.type}</strong></div>
+          <div className="stat-item"><span>STATUS</span><strong>{hashResult.undetected} Clean Engines</strong></div>
+        </div>
+        <div className="icon-wrapper">{getRiskIcon(hashResult.risk_level)}</div>
+      </div>
+    )}
+  </div>
+)}
+
+        
         </div>
       </main>
     </div>

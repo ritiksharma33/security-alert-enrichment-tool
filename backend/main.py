@@ -13,6 +13,9 @@ from services.logic import analyze_domain_risk
 
 from fastapi import UploadFile, File
 from services.bulk_service import process_bulk_csv
+from services.hash_service import lookup_hash
+
+
 
 app = FastAPI(
     title="Automated Security Alert Enrichment Tool",
@@ -50,6 +53,10 @@ async def process_alert(alert: AlertRequest):
         risk_level=risk_level,
         threat_intel=intel_model
     )
+@app.get("/api/hash")
+async def get_hash_intel(hash: str):
+    result = await lookup_hash(hash)
+    return result
 @app.post("/api/bulk-scan")
 async def bulk_scan(file: UploadFile = File(...)):
     contents = await file.read()
