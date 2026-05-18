@@ -17,7 +17,7 @@ A SOC analyst receiving 100+ alerts daily spends 10–15 minutes per alert manua
 - How old is this domain? (WHOIS lookup)
 - How many AV engines flagged this file hash? (VirusTotal lookup)
 
-That's hours of repetitive API lookups before any actual decision-making happens. **Sentinel SOAR automates the entire enrichment layer** — the analyst receives a fully enriched, risk-classified alert in under 3 seconds and can immediately focus on response.
+That's hours of repetitive API lookups before actual decision-making happens. **Sentinel SOAR automates the entire enrichment layer** — the analyst receives a fully enriched, risk-classified alert in under 3 seconds and can immediately focus on response.
 
 ---
 
