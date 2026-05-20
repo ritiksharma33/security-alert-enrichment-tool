@@ -13,7 +13,7 @@
 ## The Problem This Solves
 
 A SOC analyst receiving 100+ alerts daily spends 10–15 minutes per alert manually checking:
-- Is this IP address malicious? (AbuseIPDB lookup)
+- Is this IP address malicious? AbuseIPDB lookup
 - How old is this domain? (WHOIS lookup)
 - How many AV engines flagged this file hash? (VirusTotal lookup)
 
